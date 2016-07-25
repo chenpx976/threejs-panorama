@@ -1,0 +1,12 @@
+body {
+    background-color: #000000;
+    margin: 0;
+    cursor: move;
+    overflow: hidden;
+}
+#tip {
+  color: #ffffff;
+  position: absolute;
+  top: 0;
+  z-index: 9999;
+}
