@@ -1,281 +1,265 @@
 var camera, scene, renderer;
 
 var texture_placeholder,
-    isUserInteracting = false,
-    isUserDrag = false,
-    onMouseDownMouseX = 0,
-    onMouseDownMouseY = 0,
-    lon = 0,
-    onMouseDownLon = 0,
-    lat = 0,
-    onMouseDownLat = 0,
-    phi = 0,
-    theta = 0,
-    preLon = 0,
-    preLat = 0,
-    dLon = 0,
-    dLat = 0,
-    onPointerDownPointerX,
-    onPointerDownPointerY,
-    onPointerDownLon,
-    onPointerDownLat,
-    target = new THREE.Vector3();
+  isUserInteracting = false,
+  isUserDrag = false,
+  onMouseDownMouseX = 0,
+  onMouseDownMouseY = 0,
+  lon = 0,
+  onMouseDownLon = 0,
+  lat = 0,
+  onMouseDownLat = 0,
+  phi = 0,
+  theta = 0,
+  preLon = 0,
+  preLat = 0,
+  dLon = 0,
+  dLat = 0,
+  onPointerDownPointerX,
+  onPointerDownPointerY,
+  onPointerDownLon,
+  onPointerDownLat,
+  target = new THREE.Vector3();
 var o = new Orienter();
 init();
 animate();
 
 function init() {
 
-    var container, mesh;
+  var container, mesh;
 
-    container = document.getElementById('container');
+  container = document.getElementById('container');
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 
-    scene = new THREE.Scene();
-    // controlers = new THREE.DeviceOrientationControls(camera);
-    texture_placeholder = document.createElement('canvas');
-    texture_placeholder.width = 128;
-    texture_placeholder.height = 128;
+  scene = new THREE.Scene();
+  // controlers = new THREE.DeviceOrientationControls(camera);
+  texture_placeholder = document.createElement('canvas');
+  texture_placeholder.width = 128;
+  texture_placeholder.height = 128;
 
-    var context = texture_placeholder.getContext('2d');
-    context.fillStyle = 'rgb( 200, 200, 200 )';
-    context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
+  var context = texture_placeholder.getContext('2d');
+  context.fillStyle = 'rgb( 200, 200, 200 )';
+  context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
 
-    /*var materials = [
+  var materials = [
 
-        loadTexture('images/cube/skybox/px.jpg'), // right
-        loadTexture('images/cube/skybox/nx.jpg'), // left
-        loadTexture('images/cube/skybox/py.jpg'), // top
-        loadTexture('images/cube/skybox/ny.jpg'), // bottom
-        loadTexture('images/cube/skybox/pz.jpg'), // back
-        loadTexture('images/cube/skybox/nz.jpg') // front
+    loadTexture('images/cube/skybox/px.jpg'), // right
+    loadTexture('images/cube/skybox/nx.jpg'), // left
+    loadTexture('images/cube/skybox/py.jpg'), // top
+    loadTexture('images/cube/skybox/ny.jpg'), // bottom
+    loadTexture('images/cube/skybox/pz.jpg'), // back
+    loadTexture('images/cube/skybox/nz.jpg') // front
 
-    ];*/
-    /*var materials = [
-        loadTexture('images/cube/MilkyWay/dark-s_px.jpg'), // right
-        loadTexture('images/cube/MilkyWay/dark-s_nx.jpg'), // left
-        loadTexture('images/cube/MilkyWay/dark-s_py.jpg'), // top
-        loadTexture('images/cube/MilkyWay/dark-s_ny.jpg'), // bottom
-        loadTexture('images/cube/MilkyWay/dark-s_pz.jpg'), // back
-        loadTexture('images/cube/MilkyWay/dark-s_nz.jpg') // front
-    ];*/
-    var materials = [
+  ];
+  /*var materials = [
+   loadTexture('images/cube/MilkyWay/dark-s_px.jpg'), // right
+   loadTexture('images/cube/MilkyWay/dark-s_nx.jpg'), // left
+   loadTexture('images/cube/MilkyWay/dark-s_py.jpg'), // top
+   loadTexture('images/cube/MilkyWay/dark-s_ny.jpg'), // bottom
+   loadTexture('images/cube/MilkyWay/dark-s_pz.jpg'), // back
+   loadTexture('images/cube/MilkyWay/dark-s_nz.jpg') // front
+   ];*/
+  /*var materials = [
 
-        loadTexture('images/cube/Park2/posx.jpg'), // right
-        loadTexture('images/cube/Park2/negx.jpg'), // left
-        loadTexture('images/cube/Park2/posy.jpg'), // top
-        loadTexture('images/cube/Park2/negy.jpg'), // bottom
-        loadTexture('images/cube/Park2/posz.jpg'), // back
-        loadTexture('images/cube/Park2/negz.jpg') // front
+   loadTexture('images/cube/Park2/posx.jpg'), // right
+   loadTexture('images/cube/Park2/negx.jpg'), // left
+   loadTexture('images/cube/Park2/posy.jpg'), // top
+   loadTexture('images/cube/Park2/negy.jpg'), // bottom
+   loadTexture('images/cube/Park2/posz.jpg'), // back
+   loadTexture('images/cube/Park2/negz.jpg') // front
 
-    ];
+   ];*/
 
 
+  mesh = new THREE.Mesh(new THREE.BoxGeometry(300, 300, 300, 7, 7, 7), new THREE.MultiMaterial(materials));
+  mesh.scale.x = -1;
+  scene.add(mesh);
 
-    mesh = new THREE.Mesh(new THREE.BoxGeometry(300, 300, 300, 7, 7, 7), new THREE.MultiMaterial(materials));
-    mesh.scale.x = -1;
-    scene.add(mesh);
+  renderer = new THREE.CanvasRenderer();
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+  o.init();
+  // lat = Math.max(-85, Math.min(85, lat));
+  phi = THREE.Math.degToRad(90 - lat);
+  theta = THREE.Math.degToRad(lon);
 
-    renderer = new THREE.CanvasRenderer();
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-    o.init();
-    // lat = Math.max(-85, Math.min(85, lat));
-    phi = THREE.Math.degToRad(90 - lat);
-    theta = THREE.Math.degToRad(lon);
+  target.x = 500 * Math.sin(phi) * Math.cos(theta);
+  target.y = 500 * Math.cos(phi);
+  target.z = 500 * Math.sin(phi) * Math.sin(theta);
 
-    target.x = 500 * Math.sin(phi) * Math.cos(theta);
-    target.y = 500 * Math.cos(phi);
-    target.z = 500 * Math.sin(phi) * Math.sin(theta);
+  camera.lookAt(target);
 
-    camera.lookAt(target);
+  renderer.render(scene, camera);
 
-    renderer.render(scene, camera);
+  document.addEventListener('mousedown', onDocumentMouseDown, false);
+  document.addEventListener('mousemove', onDocumentMouseMove, false);
+  document.addEventListener('mouseup', onDocumentMouseUp, false);
+  document.addEventListener('mousewheel', onDocumentMouseWheel, false);
 
-    document.addEventListener('mousedown', onDocumentMouseDown, false);
-    document.addEventListener('mousemove', onDocumentMouseMove, false);
-    document.addEventListener('mouseup', onDocumentMouseUp, false);
-    document.addEventListener('mousewheel', onDocumentMouseWheel, false);
+  document.addEventListener('touchstart', onDocumentTouchStart, false);
+  document.addEventListener('touchmove', onDocumentTouchMove, false);
+  document.addEventListener('touchend', onDocumentTouchEnd, false);
 
-    document.addEventListener('touchstart', onDocumentTouchStart, false);
-    document.addEventListener('touchmove', onDocumentTouchMove, false);
-    document.addEventListener('touchend', onDocumentTouchEnd, false);
+  //
 
-    //
-
-    window.addEventListener('resize', onWindowResize, false);
+  window.addEventListener('resize', onWindowResize, false);
 
 }
 
 function onWindowResize() {
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
 
 function loadTexture(path) {
 
-    var texture = new THREE.Texture(texture_placeholder);
-    var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5 });
+  var texture = new THREE.Texture(texture_placeholder);
+  var material = new THREE.MeshBasicMaterial({map: texture, overdraw: 0.5});
 
-    var image = new Image();
-    image.onload = function() {
+  var image = new Image();
+  image.onload = function () {
 
-        texture.image = this;
-        texture.needsUpdate = true;
+    texture.image = this;
+    texture.needsUpdate = true;
 
-    };
-    image.src = path;
+  };
+  image.src = path;
 
-    return material;
+  return material;
 
 }
 
 function onDocumentMouseDown(event) {
 
-    event.preventDefault();
+  event.preventDefault();
 
-    isUserInteracting = true;
+  isUserInteracting = true;
 
-    onPointerDownPointerX = event.clientX;
-    onPointerDownPointerY = event.clientY;
+  onPointerDownPointerX = event.clientX;
+  onPointerDownPointerY = event.clientY;
 
-    onPointerDownLon = lon;
-    onPointerDownLat = lat;
+  onPointerDownLon = lon;
+  onPointerDownLat = lat;
 
 }
 
 function onDocumentMouseMove(event) {
 
-    if (isUserInteracting === true) {
+  if (isUserInteracting === true) {
 
-        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+    lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
 
-    }
+  }
 
 }
 
 function onDocumentMouseUp(event) {
 
-    isUserInteracting = false;
+  isUserInteracting = false;
 
 }
 
 function onDocumentMouseWheel(event) {
 
-    camera.fov -= event.wheelDeltaY * 0.05;
-    camera.updateProjectionMatrix();
+  camera.fov -= event.wheelDeltaY * 0.05;
+  camera.updateProjectionMatrix();
 
 }
 
 
 function onDocumentTouchStart(event) {
 
-    if (event.touches.length == 1) {
+  if (event.touches.length == 1) {
 
-        event.preventDefault();
-        // console.log('touchstart');
-        isUserDrag = true;
-        onPointerDownPointerX = event.touches[0].pageX;
-        onPointerDownPointerY = event.touches[0].pageY;
+    event.preventDefault();
+    // console.log('touchstart');
+    isUserDrag = true;
+    onPointerDownPointerX = event.touches[0].pageX;
+    onPointerDownPointerY = event.touches[0].pageY;
 
-        onPointerDownLon = lon;
-        onPointerDownLat = lat;
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
 
-    }
+  }
 
 }
 
 function onDocumentTouchMove(event) {
 
-    if (event.touches.length == 1) {
+  if (event.touches.length == 1) {
 
-        event.preventDefault();
-        // console.log('touchMove', lon, lat);
+    event.preventDefault();
+    // console.log('touchMove', lon, lat);
+    isUserDrag = true;
 
-        lon = (onPointerDownPointerX - event.touches[0].pageX) * 0.1 + onPointerDownLon;
-        lat = (event.touches[0].pageY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    lon = (onPointerDownPointerX - event.touches[0].pageX) * 0.1 + onPointerDownLon;
+    lat = (event.touches[0].pageY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
 
-    }
+  }
 
 }
 
 function onDocumentTouchEnd(event) {
-    // console.log('touchEnd');
-    isUserDrag = false;
+  // console.log('touchEnd');
+  isUserDrag = false;
 
 }
 
 function animate() {
 
-    requestAnimationFrame(animate);
-    update();
+  requestAnimationFrame(animate);
+  update();
 
 }
+o.handler = function (obj) {
+  var tip = document.getElementById('tip');
+  tip.innerHTML =
+    'alpha:' + obj.a +
+    '<br>' + 'beta:' + obj.b +
+    '<br>' + 'gamma:' + obj.g +
+    '<br>' + 'longitude:' + obj.lon +
+    '<br>' + 'latitude:' + obj.lat +
+    '<br>' + 'lon:' + lon +
+    '<br>' + 'lat:' + lat +
+    '<br>' + 'phi:' + phi +
+    '<br>' + 'theta:' + theta +
+    '<br>' + 'direction:' + obj.dir;
 
+  dLat = obj.lat - preLat;
+  dLon = preLon - obj.lon;
+
+  lon = lon + dLon;
+  lat = lat + dLat;
+  lat = Math.max(-85, Math.min(85, lat));
+  phi = THREE.Math.degToRad(90 - lat);
+  theta = THREE.Math.degToRad(lon);
+
+  target.x = 500 * Math.sin(phi) * Math.cos(theta);
+  target.y = 500 * Math.cos(phi);
+  target.z = 500 * Math.sin(phi) * Math.sin(theta);
+
+  preLon = obj.lon;
+  preLat = obj.lat;
+};
 function update() {
+  if (isUserDrag || isUserInteracting) {
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.Math.degToRad(90 - lat);
+    theta = THREE.Math.degToRad(lon);
 
-    // if (isUserInteracting === false) {
+    target.x = 500 * Math.sin(phi) * Math.cos(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.sin(theta);
+  }
 
-    //     lon += 0.1;
+  camera.lookAt(target);
+  renderer.render(scene, camera);
 
-    // }
-    if (isUserDrag) {
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = THREE.Math.degToRad(90 - lat);
-        theta = THREE.Math.degToRad(lon);
-
-        target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        target.y = 500 * Math.cos(phi);
-        target.z = 500 * Math.sin(phi) * Math.sin(theta);
-
-        camera.lookAt(target);
-
-        renderer.render(scene, camera);
-    }
-
-    o.handler = function(obj) {
-        var tip = document.getElementById('tip');
-        tip.innerHTML =
-            'alpha:' + obj.a +
-            '<br>' + 'beta:' + obj.b +
-            '<br>' + 'gamma:' + obj.g +
-            '<br>' + 'longitude:' + obj.lon +
-            '<br>' + 'latitude:' + obj.lat +
-            '<br>' + 'lon:' + lon +
-            '<br>' + 'lat:' + lat +
-            '<br>' + 'phi:' + phi +
-            '<br>' + 'theta:' + theta +
-            '<br>' + 'direction:' + obj.dir;
-            dLat = obj.lat - preLat;
-            dLon = preLon - obj.lon;
-        if (isUserInteracting) {
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = THREE.Math.degToRad(90 - lat);
-            theta = THREE.Math.degToRad(lon);
-
-        } else {
-            lon = lon + dLon;
-            lat = lat + dLat;
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = THREE.Math.degToRad(90 - lat);
-            theta = THREE.Math.degToRad(lon);
-        }
-
-        target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        target.y = 500 * Math.cos(phi);
-        target.z = 500 * Math.sin(phi) * Math.sin(theta);
-
-        camera.lookAt(target);
-        renderer.render(scene, camera);
-        preLon = obj.lon;
-        preLat = obj.lat;
-
-    };
 }
