@@ -1,4 +1,4 @@
-var camera, scene, renderer, stats;
+var camera, scene, renderer, stats,controlers,controls2;
 
 var texture_placeholder,
     isUserInteracting = false,
@@ -20,7 +20,6 @@ var texture_placeholder,
     onPointerDownLon,
     onPointerDownLat,
     target = new THREE.Vector3();
-var o = new Orienter();
 init();
 requestAnimationFrame(animate);
 
@@ -48,7 +47,6 @@ function initRender() {
 function init() {
 
     var container, mesh;
-    o.init();
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.right = '0px';
@@ -61,7 +59,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 
     scene = new THREE.Scene();
-    // controlers = new THREE.DeviceOrientationControls(camera);
+    controlers = new THREE.DeviceOrientationControls(camera);
     texture_placeholder = document.createElement('canvas');
     texture_placeholder.width = 128;
     texture_placeholder.height = 128;
@@ -69,26 +67,17 @@ function init() {
     var context = texture_placeholder.getContext('2d');
     context.fillStyle = 'rgb( 200, 200, 200 )';
     context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
+
     var materials = [
 
-        loadTexture('images/3_3.jpg'), // right
-        loadTexture('images/3_1.jpg'), // left
+        loadTexture('images/3_1.jpg'), // right
+        loadTexture('images/3_3.jpg'), // left
         loadTexture('images/3_0.jpg'), // top
         loadTexture('images/3_5.jpg'), // bottom
-        loadTexture('images/3_2.jpg'), // back
-        loadTexture('images/3_4.jpg') // front
+        loadTexture('images/3_4.jpg'), // back
+        loadTexture('images/3_2.jpg') // front
 
     ];
-    /*var materials = [
-
-        loadTexture('images/cube/skybox/px.jpg'), // right
-        loadTexture('images/cube/skybox/nx.jpg'), // left
-        loadTexture('images/cube/skybox/py.jpg'), // top
-        loadTexture('images/cube/skybox/ny.jpg'), // bottom
-        loadTexture('images/cube/skybox/pz.jpg'), // back
-        loadTexture('images/cube/skybox/nz.jpg') // front
-
-    ];*/
     /*var materials = [
      loadTexture('images/cube/MilkyWay/dark-s_px.jpg'), // right
      loadTexture('images/cube/MilkyWay/dark-s_nx.jpg'), // left
@@ -113,23 +102,29 @@ function init() {
     mesh.scale.x = -1;
     scene.add(mesh);
 
+
     renderer = initRender();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
+    controls2 = new THREE.OrbitControls( camera,renderer.domElement );
+    //controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
+    controls2.enableDamping = true;
+    controls2.addEventListener( 'change', render );
 
-    /*
-        phi = THREE.Math.degToRad(90 - lat);
-        theta = THREE.Math.degToRad(lon);
 
-        target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        target.y = 500 * Math.cos(phi);
-        target.z = 500 * Math.sin(phi) * Math.sin(theta);
+/*
+    phi = THREE.Math.degToRad(90 - lat);
+    theta = THREE.Math.degToRad(lon);
 
-        camera.lookAt(target);
+    target.x = 500 * Math.sin(phi) * Math.cos(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.sin(theta);
 
-        renderer.render(scene, camera);*/
+    camera.lookAt(target);
 
+    renderer.render(scene, camera);*/
+/*
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
@@ -138,7 +133,7 @@ function init() {
     document.addEventListener('touchstart', onDocumentTouchStart, false);
     document.addEventListener('touchmove', onDocumentTouchMove, false);
     document.addEventListener('touchend', onDocumentTouchEnd, false);
-
+*/
     //
 
     window.addEventListener('resize', onWindowResize, false);
@@ -154,7 +149,7 @@ function animate() {
     requestAnimationFrame(animate);
 
 }
-o.handler = function(obj) {
+/*o.handler = function(obj) {
     var tip = document.getElementById('tip');
     tip.innerHTML =
         'alpha:' + obj.a +
@@ -183,10 +178,10 @@ o.handler = function(obj) {
 
     preLon = obj.lon;
     preLat = obj.lat;
-};
+};*/
 
 function update() {
-    if (isUserDrag || isUserInteracting) {
+    /*if (isUserDrag || isUserInteracting) {
         lat = Math.max(-85, Math.min(85, lat));
         phi = THREE.Math.degToRad(90 - lat);
         theta = THREE.Math.degToRad(lon);
@@ -197,10 +192,15 @@ function update() {
     }
 
     camera.lookAt(target);
-    renderer.render(scene, camera);
+    */
+
+    controlers.update();
+    render();
 
 }
-
+function render() {
+    renderer.render(scene, camera);
+}
 function onWindowResize() {
 
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -227,7 +227,7 @@ function loadTexture(path) {
     return material;
 
 }
-
+/*
 function onDocumentMouseDown(event) {
 
     event.preventDefault();
@@ -304,3 +304,4 @@ function onDocumentTouchEnd(event) {
     isUserDrag = false;
 
 }
+*/

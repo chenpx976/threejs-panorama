@@ -4,9 +4,17 @@ body {
     cursor: move;
     overflow: hidden;
 }
+
+#container {}
+
 #tip {
-  color: #ffffff;
-  position: absolute;
-  top: 0;
-  z-index: 9999;
+    color: #ffffff;
+    position: absolute;
+    top: 0;
+    z-index: 9999;
+}
+
+#main {
+    width: 500px;
+    width: 500px;
 }

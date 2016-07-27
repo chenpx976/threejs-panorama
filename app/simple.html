@@ -1,46 +1,46 @@
 <!doctype html>
 <html class="no-js" lang="">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>css3d demo</title>
-
+    <title>threejs demo</title>
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
-
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
     <!-- endbower -->
     <!-- endbuild -->
-
     <!-- build:css styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-
     <!-- build:js scripts/vendor/modernizr.js -->
     <script src="/bower_components/modernizr/modernizr.js"></script>
     <!-- endbuild -->
-  </head>
-  <body>
+</head>
 
-    <div id="tip"></div>
-    <div id="main">
-
-    </div>
+<body>
+    <!--[if lt IE 10]>
+      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div id="container"></div>
+    <p id="tip"></p>
     <!-- build:js scripts/vendor.js -->
-    <script src="scripts/lib/css3d.js"></script>
-    <script src="scripts/lib/orienter.js"></script>
-    <script src="scripts/lib/math.js"></script>
     <!-- bower:js -->
     <script src="/bower_components/jquery/dist/jquery.js"></script>
     <script src="/bower_components/three.js/three.min.js"></script>
     <script src="/bower_components/stats.js/src/Stats.js"></script>
     <!-- endbower -->
+    <script src="scripts/renderers/Projector.js"></script>
+    <script src="scripts/renderers/CanvasRenderer.js"></script>
+    <script src="scripts/renderers/CSS3DRenderer.js"></script>
+    <script src="scripts/controls/DeviceOrientationControls.js"></script>
+    <script src="scripts/controls/OrbitControls.js"></script>
     <!-- endbuild -->
-
     <!-- build:js scripts/main.js -->
-    <script src="scripts/css3d.js"></script>
+    <script src="scripts/simple.js"></script>
     <!-- endbuild -->
-  </body>
+</body>
+
 </html>
