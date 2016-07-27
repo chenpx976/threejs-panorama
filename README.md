@@ -63,4 +63,7 @@ Three.js 方案
         - 实现方案较为繁琐
 
 
+## 使用的项目
+
+- [制作 Three.js 使用的全景图](https://github.com/budblack/Panoramic)
 

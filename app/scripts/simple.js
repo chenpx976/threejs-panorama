@@ -1,4 +1,4 @@
-var camera, scene, renderer, stats,controlers,controls2;
+var camera, scene, renderer, stats, controlers, controls2;
 
 var texture_placeholder,
     isUserInteracting = false,
@@ -47,6 +47,7 @@ function initRender() {
 function init() {
 
     var container, mesh;
+
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.right = '0px';
@@ -55,51 +56,38 @@ function init() {
     document.body.appendChild(stats.domElement);
 
     container = document.getElementById('container');
-
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-
     scene = new THREE.Scene();
     controlers = new THREE.DeviceOrientationControls(camera);
+
+/*
     texture_placeholder = document.createElement('canvas');
     texture_placeholder.width = 128;
     texture_placeholder.height = 128;
-
     var context = texture_placeholder.getContext('2d');
     context.fillStyle = 'rgb( 200, 200, 200 )';
     context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
-
     var materials = [
-
         loadTexture('images/3_1.jpg'), // right
         loadTexture('images/3_3.jpg'), // left
         loadTexture('images/3_0.jpg'), // top
         loadTexture('images/3_5.jpg'), // bottom
         loadTexture('images/3_4.jpg'), // back
         loadTexture('images/3_2.jpg') // front
-
     ];
-    /*var materials = [
-     loadTexture('images/cube/MilkyWay/dark-s_px.jpg'), // right
-     loadTexture('images/cube/MilkyWay/dark-s_nx.jpg'), // left
-     loadTexture('images/cube/MilkyWay/dark-s_py.jpg'), // top
-     loadTexture('images/cube/MilkyWay/dark-s_ny.jpg'), // bottom
-     loadTexture('images/cube/MilkyWay/dark-s_pz.jpg'), // back
-     loadTexture('images/cube/MilkyWay/dark-s_nz.jpg') // front
-     ];*/
-    /*var materials = [
-
-     loadTexture('images/cube/Park2/posx.jpg'), // right
-     loadTexture('images/cube/Park2/negx.jpg'), // left
-     loadTexture('images/cube/Park2/posy.jpg'), // top
-     loadTexture('images/cube/Park2/negy.jpg'), // bottom
-     loadTexture('images/cube/Park2/posz.jpg'), // back
-     loadTexture('images/cube/Park2/negz.jpg') // front
-
-     ];*/
-
-
     mesh = new THREE.Mesh(new THREE.BoxGeometry(300, 300, 300, 7, 7, 7), new THREE.MultiMaterial(materials));
     mesh.scale.x = -1;
+    */
+
+    var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+    geometry.scale( - 1, 1, 1 );
+
+    var material = new THREE.MeshBasicMaterial( {
+        map: new THREE.TextureLoader().load( 'images/cube/2294472375_24a3b8ef46_o.jpg' )
+    } );
+
+    mesh = new THREE.Mesh( geometry, material );
+
     scene.add(mesh);
 
 
@@ -107,33 +95,33 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
-    controls2 = new THREE.OrbitControls( camera,renderer.domElement );
+    controls2 = new THREE.OrbitControls(camera, renderer.domElement);
     //controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
     controls2.enableDamping = true;
-    controls2.addEventListener( 'change', render );
+    controls2.addEventListener('change', render);
 
 
-/*
-    phi = THREE.Math.degToRad(90 - lat);
-    theta = THREE.Math.degToRad(lon);
+    /*
+        phi = THREE.Math.degToRad(90 - lat);
+        theta = THREE.Math.degToRad(lon);
 
-    target.x = 500 * Math.sin(phi) * Math.cos(theta);
-    target.y = 500 * Math.cos(phi);
-    target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        target.x = 500 * Math.sin(phi) * Math.cos(theta);
+        target.y = 500 * Math.cos(phi);
+        target.z = 500 * Math.sin(phi) * Math.sin(theta);
 
-    camera.lookAt(target);
+        camera.lookAt(target);
 
-    renderer.render(scene, camera);*/
-/*
-    document.addEventListener('mousedown', onDocumentMouseDown, false);
-    document.addEventListener('mousemove', onDocumentMouseMove, false);
-    document.addEventListener('mouseup', onDocumentMouseUp, false);
-    document.addEventListener('mousewheel', onDocumentMouseWheel, false);
+        renderer.render(scene, camera);*/
+    /*
+        document.addEventListener('mousedown', onDocumentMouseDown, false);
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+        document.addEventListener('mouseup', onDocumentMouseUp, false);
+        document.addEventListener('mousewheel', onDocumentMouseWheel, false);
 
-    document.addEventListener('touchstart', onDocumentTouchStart, false);
-    document.addEventListener('touchmove', onDocumentTouchMove, false);
-    document.addEventListener('touchend', onDocumentTouchEnd, false);
-*/
+        document.addEventListener('touchstart', onDocumentTouchStart, false);
+        document.addEventListener('touchmove', onDocumentTouchMove, false);
+        document.addEventListener('touchend', onDocumentTouchEnd, false);
+    */
     //
 
     window.addEventListener('resize', onWindowResize, false);
@@ -198,9 +186,11 @@ function update() {
     render();
 
 }
+
 function render() {
     renderer.render(scene, camera);
 }
+
 function onWindowResize() {
 
     camera.aspect = window.innerWidth / window.innerHeight;
