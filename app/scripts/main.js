@@ -63,8 +63,9 @@ function init() {
 
     container = document.getElementById('container');
     camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 1100);
-    controls = new THREE.DeviceOrientationControls(camera);
-    controls.connect();
+    controls = new THREE.OrbitControls(camera);
+    controls.enableZoom = false;
+    controls.enablePan = false;
 
     scene = new THREE.Scene();
 
