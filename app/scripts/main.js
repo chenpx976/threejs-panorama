@@ -134,18 +134,19 @@ o.handler = function(obj) {
         '<br>' + 'phi:' + phi +
         '<br>' + 'theta:' + theta +
         '<br>' + 'direction:' + obj.dir;
-
-    dLat = obj.lat - preLat;
-    dLon = preLon - obj.lon;
-    lon = Math.floor(lon + dLon);
-    lat = Math.floor(lat + dLat);
-    render(lon, lat);
-    preLon = obj.lon;
-    preLat = obj.lat;
+    if (flagOri && !isUserDrag) {
+        dLat = obj.lat - preLat;
+        dLon = preLon - obj.lon;
+        lon = Math.floor(lon + dLon);
+        lat = Math.floor(lat + dLat);
+        render(lon, lat);
+        preLon = obj.lon;
+        preLat = obj.lat;
+    }
 };
 
 function update() {
-    if (isUserDrag || isUserInteracting) {
+    if (flagDrag && (isUserDrag || isUserInteracting)) {
         render(lon, lat);
     }
 }
