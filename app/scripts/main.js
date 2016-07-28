@@ -5,7 +5,7 @@ var isUserInteracting = false,
     flagDrag = true,
     flagOri = true,
     flagDebug = true,
-    lon = 0,
+    lon = 90,
     lat = 0,
     phi = 0,
     theta = 0,
@@ -21,7 +21,7 @@ var isUserInteracting = false,
     onPointerDownPointerY,
     onPointerDownLon,
     onPointerDownLat,
-    o = new Orienter(),
+    // o = new Orienter(),
     stats = new Stats(),
     target = new THREE.Vector3();
 var sides = [{
@@ -54,7 +54,7 @@ init();
 
 function init() {
     var container, mesh;
-    o.init();
+    // o.init();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '110px';
     stats.domElement.style.top = '110px';
@@ -63,6 +63,9 @@ function init() {
 
     container = document.getElementById('container');
     camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 1100);
+    controls = new THREE.DeviceOrientationControls(camera);
+    controls.connect();
+
     scene = new THREE.Scene();
 
     var cube = new THREE.Object3D();
@@ -87,15 +90,6 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-
-    phi = THREE.Math.degToRad(90 - lat);
-    theta = THREE.Math.degToRad(lon);
-    target.x = 500 * Math.sin(phi) * Math.cos(theta);
-    target.y = 500 * Math.cos(phi);
-    target.z = 500 * Math.sin(phi) * Math.sin(theta);
-    camera.lookAt(target);
-    renderer.render(scene, camera);
-
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
@@ -107,54 +101,71 @@ function init() {
 
     //
 
+    window.addEventListener('deviceorientation', setOrientationControls, true);
+
     window.addEventListener('resize', onWindowResize, false);
     requestAnimationFrame(animate);
 
 }
 
 function animate() {
+
+
     stats.begin();
-
-    update();
-
+    controls.update();
+    renderer.render(scene, camera);
     stats.end();
     requestAnimationFrame(animate);
 
 }
-o.handler = function(obj) {
-    var tip = document.getElementById('tip');
-    tip.innerHTML =
-        'alpha:' + obj.a +
-        '<br>' + 'beta:' + obj.b +
-        '<br>' + 'gamma:' + obj.g +
-        '<br>' + 'longitude:' + obj.lon +
-        '<br>' + 'latitude:' + obj.lat +
-        '<br>' + 'lon:' + lon +
-        '<br>' + 'lat:' + lat +
-        '<br>' + 'phi:' + phi +
-        '<br>' + 'theta:' + theta +
-        '<br>' + 'direction:' + obj.dir;
-    if (flagOri && !isUserDrag) {
-        dLat = obj.lat - preLat;
-        dLon = preLon - obj.lon;
-        lon = Math.floor(lon + dLon);
-        lat = Math.floor(lat + dLat);
-        render(lon, lat);
-        preLon = obj.lon;
-        preLat = obj.lat;
+
+function setOrientationControls(e) {
+    console.log(e.alpha);
+    if (!e.alpha) {
+        return;
     }
-};
+    controls = new THREE.DeviceOrientationControls(camera, true);
+    controls.connect();
+    controls.update();
+    window.removeEventListener('deviceorientation', setOrientationControls, true);
+}
+// o.handler = function(obj) {
+//     var tip = document.getElementById('tip');
+//     tip.innerHTML =
+//         'alpha:' + obj.a +
+//         '<br>' + 'beta:' + obj.b +
+//         '<br>' + 'gamma:' + obj.g +
+//         '<br>' + 'longitude:' + obj.lon +
+//         '<br>' + 'latitude:' + obj.lat +
+//         '<br>' + 'lon:' + lon +
+//         '<br>' + 'lat:' + lat +
+//         '<br>' + 'phi:' + phi +
+//         '<br>' + 'theta:' + theta +
+//         '<br>' + 'direction:' + obj.dir;
+//     if (flagOri && !isUserDrag) {
+//         dLat = obj.lat - preLat;
+//         dLon = preLon - obj.lon;
+//         lon = Math.floor(lon + dLon);
+//         lat = Math.floor(lat + dLat);
+//         render(lon, lat);
+//         preLon = obj.lon;
+//         preLat = obj.lat;
+//     }
+// };
 
 function update() {
-    if (flagDrag && (isUserDrag || isUserInteracting)) {
-        render(lon, lat);
-    }
+
+    // if (flagDrag && (isUserDrag || isUserInteracting)) {
+    //     render(lon, lat);
+    // }
+
+
 }
 
 function render(lon, lat) {
     lat = Math.max(-85, Math.min(85, lat));
-    phi = THREE.Math.degToRad(90 - lat);
     theta = THREE.Math.degToRad(lon);
+    phi = THREE.Math.degToRad(90 - lat);
     target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
     target.y = Math.floor(500 * Math.cos(phi));
     target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
