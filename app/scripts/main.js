@@ -1,92 +1,69 @@
-var camera, scene, renderer, stats;
+var camera, scene, renderer, controls;
 
-var texture_placeholder,
-    isUserInteracting = false,
+var isUserInteracting = false,
     isUserDrag = false,
-    onMouseDownMouseX = 0,
-    onMouseDownMouseY = 0,
+    flagDrag = true,
+    flagOri = true,
+    flagDebug = true,
     lon = 0,
-    onMouseDownLon = 0,
     lat = 0,
-    onMouseDownLat = 0,
     phi = 0,
     theta = 0,
     preLon = 0,
     preLat = 0,
     dLon = 0,
     dLat = 0,
+    onTouchDownTouchX = 0,
+    onTouchDownTouchY = 0,
+    onTouchDownLon = 0,
+    onTouchDownLat = 0,
     onPointerDownPointerX,
     onPointerDownPointerY,
     onPointerDownLon,
     onPointerDownLat,
+    o = new Orienter(),
+    stats = new Stats(),
     target = new THREE.Vector3();
-var o = new Orienter();
+var sides = [{
+    url: 'images/front.jpg', // front
+    position: [512, 0, 0],
+    rotation: [0, -Math.PI / 2, 0]
+}, {
+    url: 'images/back.jpg', // back
+    position: [-512, 0, 0],
+    rotation: [0, Math.PI / 2, 0]
+}, {
+    url: 'images/left.jpg', // left
+    position: [0, 0, -512],
+    rotation: [0, 0, 0]
+}, {
+    url: 'images/right.jpg', // right
+    position: [0, 0, 512],
+    rotation: [0, Math.PI, 0]
+}, {
+    url: 'images/top.jpg', // top
+    position: [0, 512, 0],
+    rotation: [Math.PI / 2, 0, Math.PI / 2]
+}, {
+    url: 'images/bottom.jpg', //bottom
+    position: [0, -512, 0],
+    rotation: [-Math.PI / 2, 0, -Math.PI / 2]
+}];
+
 init();
-requestAnimationFrame(animate);
-
-function webglAvailable() {
-    try {
-        var canvas = document.createElement('canvas');
-        return !!(window.WebGLRenderingContext && (
-            canvas.getContext('webgl') ||
-            canvas.getContext('experimental-webgl')));
-    } catch (e) {
-        return false;
-    }
-}
-
-function initRender() {
-    if (webglAvailable()) {
-        return new THREE.WebGLRenderer({
-            antialias: true
-        });
-    } else {
-        return new THREE.CanvasRenderer();
-    }
-}
 
 function init() {
-
     var container, mesh;
     o.init();
-    stats = new Stats();
     stats.domElement.style.position = 'absolute';
-    stats.domElement.style.right = '0px';
-    stats.domElement.style.top = '0px';
+    stats.domElement.style.left = '110px';
+    stats.domElement.style.top = '110px';
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.domElement);
 
     container = document.getElementById('container');
-
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-
+    camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 1100);
     scene = new THREE.Scene();
-
-    var sides = [{
-        url: 'images/back.jpg', // back
-        position: [-512, 0, 0],
-        rotation: [0, Math.PI / 2, 0]
-    }, {
-        url: 'images/front.jpg', // front
-        position: [512, 0, 0],
-        rotation: [0, -Math.PI / 2, 0]
-    }, {
-        url: 'images/top.jpg', // top
-        position: [0, 512, 0],
-        rotation: [Math.PI / 2, 0, Math.PI /2]
-    }, {
-        url: 'images/bottom.jpg', //bottom
-        position: [0, -512, 0],
-        rotation: [-Math.PI / 2, 0, -Math.PI /2]
-    }, {
-        url: 'images/right.jpg', // right
-        position: [0, 0, 512],
-        rotation: [0, Math.PI, 0]
-    }, {
-        url: 'images/left.jpg', // left
-        position: [0, 0, -512],
-        rotation: [0, 0, 0]
-    }];
 
     var cube = new THREE.Object3D();
     scene.add(cube);
@@ -110,17 +87,14 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    /*
-        phi = THREE.Math.degToRad(90 - lat);
-        theta = THREE.Math.degToRad(lon);
 
-        target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        target.y = 500 * Math.cos(phi);
-        target.z = 500 * Math.sin(phi) * Math.sin(theta);
-
-        camera.lookAt(target);
-
-        renderer.render(scene, camera);*/
+    phi = THREE.Math.degToRad(90 - lat);
+    theta = THREE.Math.degToRad(lon);
+    target.x = 500 * Math.sin(phi) * Math.cos(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.sin(theta);
+    camera.lookAt(target);
+    renderer.render(scene, camera);
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -134,6 +108,7 @@ function init() {
     //
 
     window.addEventListener('resize', onWindowResize, false);
+    requestAnimationFrame(animate);
 
 }
 
@@ -162,35 +137,29 @@ o.handler = function(obj) {
 
     dLat = obj.lat - preLat;
     dLon = preLon - obj.lon;
-
     lon = Math.floor(lon + dLon);
     lat = Math.floor(lat + dLat);
-    lat = Math.max(-85, Math.min(85, lat));
-    phi = THREE.Math.degToRad(90 - lat);
-    theta = THREE.Math.degToRad(lon);
-
-    target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
-    target.y = Math.floor(500 * Math.cos(phi));
-    target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
-
+    render(lon, lat);
     preLon = obj.lon;
     preLat = obj.lat;
 };
 
 function update() {
     if (isUserDrag || isUserInteracting) {
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = THREE.Math.degToRad(90 - lat);
-        theta = THREE.Math.degToRad(lon);
-
-        target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        target.y = 500 * Math.cos(phi);
-        target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        render(lon, lat);
     }
+}
 
+function render(lon, lat) {
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.Math.degToRad(90 - lat);
+    theta = THREE.Math.degToRad(lon);
+    target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
+    target.y = Math.floor(500 * Math.cos(phi));
+    target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
+    console.log(target);
     camera.lookAt(target);
     renderer.render(scene, camera);
-
 }
 
 function onWindowResize() {
@@ -199,24 +168,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-}
-
-function loadTexture(path) {
-
-    var texture = new THREE.Texture(texture_placeholder);
-    var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5 });
-
-    var image = new Image();
-    image.onload = function() {
-
-        texture.image = this;
-        texture.needsUpdate = true;
-
-    };
-    image.src = path;
-
-    return material;
 
 }
 

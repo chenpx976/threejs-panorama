@@ -11,7 +11,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.object = object;
 
-	this.object.rotation.reorder( 'YXZ' );
+	this.object.rotation.reorder( "YXZ" );
 
 	this.freeze = true;
 
@@ -53,20 +53,6 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) );    // adjust for screen orientation
 
-			var tx = Math.floor((360-alpha) * 100);
-			var ty = Math.floor(beta*100);
-			var tz = Math.floor(gamma*100);
-
-			//$('#alpha').html('x:  ' + camera.quaternion.x);
-			//$('#beta').html('y:  ' + camera.quaternion.y);
-			//$('#gamma').html('z:  ' + camera.quaternion.z);
-			//$('#orient').html('w:  ' + camera.quaternion.w);
-
-			//$('#alpha').html('x:  ' + tx);
-			//$('#beta').html('y:  ' + ty);
-			//$('#gamma').html('z:  ' + tz);
-
-			if( typeof setLo === 'function' ){setLo(alpha, beta, gamma);}
 		}
 
 	}();
@@ -99,14 +85,6 @@ THREE.DeviceOrientationControls = function ( object ) {
 		var beta   = scope.deviceOrientation.beta  ? THREE.Math.degToRad( scope.deviceOrientation.beta  ) : 0; // X'
 		var gamma  = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.gamma ) : 0; // Y''
 		var orient = scope.screenOrientation       ? THREE.Math.degToRad( scope.screenOrientation       ) : 0; // O
-
-		//$('#alpha').html('alpha:' + Math.floor(scope.deviceOrientation.gamma));
-		//$('#beta').html('beta:' + Math.floor(scope.deviceOrientation.beta));
-		//$('#gamma').html('gamma:' + Math.floor(scope.deviceOrientation.gamma));
-
-		//$('#alpha').html('alpha:' + scope.deviceOrientation.alpha);
-		//$('#beta').html('beta:' + scope.deviceOrientation.beta);
-		//$('#gamma').html('gamma:' + scope.deviceOrientation.gamma);
 
 		setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
 
