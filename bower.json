@@ -2,9 +2,7 @@
   "name": "threejs-demo",
   "private": true,
   "dependencies": {
-    "jquery": "~2.1.1",
     "modernizr": "~2.8.1",
-    "three.js": "^0.78.0",
     "stats.js": "*"
   }
 }

@@ -207,10 +207,10 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + "px";
-			domElement.style.MozPerspective = fov + "px";
-			domElement.style.oPerspective = fov + "px";
-			domElement.style.perspective = fov + "px";
+			domElement.style.WebkitPerspective = fov + 'px';
+			domElement.style.MozPerspective = fov + 'px';
+			domElement.style.oPerspective = fov + 'px';
+			domElement.style.perspective = fov + 'px';
 
 			cache.camera.fov = fov;
 
@@ -222,8 +222,8 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +
-			" translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
+		var style = 'translate3d(0,0,' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) +
+			' translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, 0)';
 
 		if ( cache.camera.style !== style ) {
 

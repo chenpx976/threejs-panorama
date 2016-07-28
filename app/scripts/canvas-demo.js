@@ -62,60 +62,62 @@ function init() {
 
     scene = new THREE.Scene();
 
-                var sides = [
-                    {
-                        url: 'images/3_1.jpg',
-                        position: [ -512, 0, 0 ],
-                        rotation: [ 0, Math.PI / 2, 0 ]
-                    },
-                    {
-                        url: 'images/3_3.jpg',
-                        position: [ 512, 0, 0 ],
-                        rotation: [ 0, -Math.PI / 2, 0 ]
-                    },
-                    {
-                        url: 'images/3_0.jpg',
-                        position: [ 0,  512, 0 ],
-                        rotation: [ Math.PI / 2, 0, Math.PI ]
-                    },
-                    {
-                        url: 'images/3_5.jpg',
-                        position: [ 0, -512, 0 ],
-                        rotation: [ - Math.PI / 2, 0, Math.PI ]
-                    },
-                    {
-                        url: 'images/3_4.jpg',
-                        position: [ 0, 0,  512 ],
-                        rotation: [ 0, Math.PI, 0 ]
-                    },
-                    {
-                        url: 'images/3_2.jpg',
-                        position: [ 0, 0, -512 ],
-                        rotation: [ 0, 0, 0 ]
-                    }
-                ];
+    texture_placeholder = document.createElement('canvas');
+    texture_placeholder.width = 128;
+    texture_placeholder.height = 128;
 
-    var cube = new THREE.Object3D();
-    scene.add( cube );
+    var context = texture_placeholder.getContext('2d');
+    context.fillStyle = 'rgb( 200, 200, 200 )';
+    context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
+    var materials = [
 
-    for ( var i = 0; i < sides.length; i ++ ) {
+        loadTexture('images/3_1.jpg'), // right
+        loadTexture('images/3_3.jpg'), // left
+        loadTexture('images/3_0.jpg'), // top
+        loadTexture('images/3_5.jpg'), // bottom
+        loadTexture('images/3_4.jpg'), // back
+        loadTexture('images/3_2.jpg') // front
 
-        var side = sides[ i ];
+    ];
 
-        var element = document.createElement( 'img' );
-        element.width = 1026; // 2 pixels extra to close the gap.
-        element.src = side.url;
+    /*var materials = [
 
-        var object = new THREE.CSS3DObject( element );
-        object.position.fromArray( side.position );
-        object.rotation.fromArray( side.rotation );
-        cube.add( object );
+        loadTexture('images/cube/skybox/px.jpg'), // right
+        loadTexture('images/cube/skybox/nx.jpg'), // left
+        loadTexture('images/cube/skybox/py.jpg'), // top
+        loadTexture('images/cube/skybox/ny.jpg'), // bottom
+        loadTexture('images/cube/skybox/pz.jpg'), // back
+        loadTexture('images/cube/skybox/nz.jpg') // front
 
-    }
+    ];*/
+    /*var materials = [
+     loadTexture('images/cube/MilkyWay/dark-s_px.jpg'), // right
+     loadTexture('images/cube/MilkyWay/dark-s_nx.jpg'), // left
+     loadTexture('images/cube/MilkyWay/dark-s_py.jpg'), // top
+     loadTexture('images/cube/MilkyWay/dark-s_ny.jpg'), // bottom
+     loadTexture('images/cube/MilkyWay/dark-s_pz.jpg'), // back
+     loadTexture('images/cube/MilkyWay/dark-s_nz.jpg') // front
+     ];*/
+    /*var materials = [
 
-    renderer = new THREE.CSS3DRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
+     loadTexture('images/cube/Park2/posx.jpg'), // right
+     loadTexture('images/cube/Park2/negx.jpg'), // left
+     loadTexture('images/cube/Park2/posy.jpg'), // top
+     loadTexture('images/cube/Park2/negy.jpg'), // bottom
+     loadTexture('images/cube/Park2/posz.jpg'), // back
+     loadTexture('images/cube/Park2/negz.jpg') // front
+
+     ];*/
+
+
+    mesh = new THREE.Mesh(new THREE.BoxGeometry(300, 300, 300, 7, 7, 7), new THREE.MultiMaterial(materials));
+    mesh.scale.x = -1;
+    scene.add(mesh);
+
+    renderer = initRender();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
     /*
         phi = THREE.Math.degToRad(90 - lat);
@@ -166,24 +168,22 @@ o.handler = function(obj) {
         '<br>' + 'phi:' + phi +
         '<br>' + 'theta:' + theta +
         '<br>' + 'direction:' + obj.dir;
-    if (!isUserDrag) {
 
-        dLat = obj.lat - preLat;
-        dLon = preLon - obj.lon;
+    dLat = obj.lat - preLat;
+    dLon = preLon - obj.lon;
 
-        lon = Math.floor(lon + dLon);
-        lat = Math.floor(lat + dLat);
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = THREE.Math.degToRad(90 - lat);
-        theta = THREE.Math.degToRad(lon);
+    lon = Math.floor(lon + dLon);
+    lat = Math.floor(lat + dLat);
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.Math.degToRad(90 - lat);
+    theta = THREE.Math.degToRad(lon);
 
-        target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
-        target.y = Math.floor(500 * Math.cos(phi));
-        target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
+    target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
+    target.y = Math.floor(500 * Math.cos(phi));
+    target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
 
-        preLon = obj.lon;
-        preLat = obj.lat;
-    }
+    preLon = obj.lon;
+    preLat = obj.lat;
 };
 
 function update() {
