@@ -61,7 +61,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 
     scene = new THREE.Scene();
-    // controlers = new THREE.DeviceOrientationControls(camera);
+
     texture_placeholder = document.createElement('canvas');
     texture_placeholder.width = 128;
     texture_placeholder.height = 128;
@@ -71,14 +71,15 @@ function init() {
     context.fillRect(0, 0, texture_placeholder.width, texture_placeholder.height);
     var materials = [
 
-        loadTexture('images/3_3.jpg'), // right
-        loadTexture('images/3_1.jpg'), // left
+        loadTexture('images/3_1.jpg'), // right
+        loadTexture('images/3_3.jpg'), // left
         loadTexture('images/3_0.jpg'), // top
         loadTexture('images/3_5.jpg'), // bottom
-        loadTexture('images/3_2.jpg'), // back
-        loadTexture('images/3_4.jpg') // front
+        loadTexture('images/3_4.jpg'), // back
+        loadTexture('images/3_2.jpg') // front
 
     ];
+
     /*var materials = [
 
         loadTexture('images/cube/skybox/px.jpg'), // right
