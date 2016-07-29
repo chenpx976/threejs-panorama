@@ -103,7 +103,7 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    window.addEventListener('deviceorientation', setOrientationControls, true);
+    // window.addEventListener('deviceorientation', setOrientationControls, true);
 
     window.addEventListener('resize', onWindowResize, false);
 

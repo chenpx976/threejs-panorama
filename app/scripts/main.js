@@ -1,7 +1,7 @@
 var camera, scene, renderer, controls;
 
 var isUserInteracting = false,
-    isUserDrag = false,
+    latestInteraction = Date.now(),
     flagDrag = true,
     flagOri = true,
     flagDebug = true,
@@ -21,8 +21,12 @@ var isUserInteracting = false,
     onPointerDownPointerY,
     onPointerDownLon,
     onPointerDownLat,
-    // o = new Orienter(),
-    stats = new Stats(),
+    stats,
+    compass,
+    speed,
+    A,
+    timer,
+    o = new Orienter(),
     target = new THREE.Vector3();
 var sides = [{
     url: 'images/front.jpg', // front
@@ -52,21 +56,24 @@ var sides = [{
 
 init();
 
+
 function init() {
     var container, mesh;
-    // o.init();
+    o.init();
+
+    stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '110px';
     stats.domElement.style.top = '110px';
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.domElement);
 
+    compass = document.createElement('div');
+    compass.id = 'compass';
+    document.body.appendChild(compass);
+
     container = document.getElementById('container');
     camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 1100);
-    controls = new THREE.OrbitControls(camera);
-    controls.enableZoom = false;
-    controls.enablePan = false;
-
     scene = new THREE.Scene();
 
     var cube = new THREE.Object3D();
@@ -91,6 +98,8 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+
+    render(0, lat);
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
@@ -101,25 +110,71 @@ function init() {
     document.addEventListener('touchend', onDocumentTouchEnd, false);
 
     //
+    document.getElementById('drag').addEventListener('touchstart', function(e) {
+        flagDrag = !flagDrag;
+        console.log(flagDrag);
+    }, false);
+    document.getElementById('ori').addEventListener('touchstart', function(e) {
+        flagOri = !flagOri;
+        console.log(flagOri);
+    }, false);
 
-    window.addEventListener('deviceorientation', setOrientationControls, true);
+    window.addEventListener('deviceorientation', oriInit, true);
+
 
     window.addEventListener('resize', onWindowResize, false);
-    requestAnimationFrame(animate);
+
+    animate();
 
 }
+function oriInit() {
+    o.handler = function(obj) {
+        /*var tip = document.getElementById('tip');
+        tip.innerHTML =
+            'alpha:' + obj.a +
+            '<br>' + 'beta:' + obj.b +
+            '<br>' + 'gamma:' + obj.g +
+            '<br>' + 'longitude:' + obj.lon +
+            '<br>' + 'latitude:' + obj.lat +
+            '<br>' + 'lon:' + lon +
+            '<br>' + 'lat:' + lat +
+            '<br>' + 'phi:' + phi +
+            '<br>' + 'theta:' + theta +
+            '<br>' + 'direction:' + obj.dir;*/
+        if (flagOri && !flagDrag) {
+            // 开启重力感应 && 关闭拖拽
+            lon = Math.floor(obj.lon);
+            lat = Math.floor(obj.lat);
+            render(-lon, lat);
+            console.log('开启重力感应 && 关闭拖拽');
+        } else if (flagOri && flagDrag) {
+            // 开启重力感应 && 开启拖拽
+            if (!isUserInteracting) {
+                dLat = obj.lat - preLat;
+                dLon = preLon - obj.lon;
+                lon = Math.floor(lon + dLon);
+                lat = Math.floor(lat + dLat);
+                render(lon, lat);
+                preLon = obj.lon;
+                preLat = obj.lat;
+                console.log('开启重力感应 && 开启拖拽');
+            }
+        }
+
+    };
+}
+
+
 
 function animate() {
-
-
     stats.begin();
-    controls.update();
-    renderer.render(scene, camera);
+    if (flagDrag && isUserInteracting) {
+        render(lon, lat);
+    }
     stats.end();
-    requestAnimationFrame(animate);
-
+    A = requestAnimationFrame(animate);
 }
-
+/*
 function setOrientationControls(e) {
     console.log(e.alpha);
     if (!e.alpha) {
@@ -129,48 +184,18 @@ function setOrientationControls(e) {
     controls.connect();
     controls.update();
     window.removeEventListener('deviceorientation', setOrientationControls, true);
-}
-// o.handler = function(obj) {
-//     var tip = document.getElementById('tip');
-//     tip.innerHTML =
-//         'alpha:' + obj.a +
-//         '<br>' + 'beta:' + obj.b +
-//         '<br>' + 'gamma:' + obj.g +
-//         '<br>' + 'longitude:' + obj.lon +
-//         '<br>' + 'latitude:' + obj.lat +
-//         '<br>' + 'lon:' + lon +
-//         '<br>' + 'lat:' + lat +
-//         '<br>' + 'phi:' + phi +
-//         '<br>' + 'theta:' + theta +
-//         '<br>' + 'direction:' + obj.dir;
-//     if (flagOri && !isUserDrag) {
-//         dLat = obj.lat - preLat;
-//         dLon = preLon - obj.lon;
-//         lon = Math.floor(lon + dLon);
-//         lat = Math.floor(lat + dLat);
-//         render(lon, lat);
-//         preLon = obj.lon;
-//         preLat = obj.lat;
-//     }
-// };
+}*/
 
-function update() {
-
-    // if (flagDrag && (isUserDrag || isUserInteracting)) {
-    //     render(lon, lat);
-    // }
-
-
-}
 
 function render(lon, lat) {
     lat = Math.max(-85, Math.min(85, lat));
     theta = THREE.Math.degToRad(lon);
     phi = THREE.Math.degToRad(90 - lat);
-    target.x = Math.floor(500 * Math.sin(phi) * Math.cos(theta));
-    target.y = Math.floor(500 * Math.cos(phi));
-    target.z = Math.floor(500 * Math.sin(phi) * Math.sin(theta));
-    console.log(target);
+    target.x = 1000 * 500 * Math.sin(phi) * Math.cos(theta);
+    target.y = 1000 * 500 * Math.cos(phi);
+    target.z = 1000 * 500 * Math.sin(phi) * Math.sin(theta);
+    compass.style.transform = 'rotate(' + lon + 'deg)';
+    compass.style.webkitTransform = 'rotate(' + lon + 'deg)';
     camera.lookAt(target);
     renderer.render(scene, camera);
 }
@@ -229,7 +254,10 @@ function onDocumentTouchStart(event) {
 
         event.preventDefault();
         // console.log('touchstart');
-        isUserDrag = true;
+        isUserInteracting = true;
+        latestInteraction = Date.now();
+        o.destroy();
+        clearInterval(timer);
         onPointerDownPointerX = event.touches[0].pageX;
         onPointerDownPointerY = event.touches[0].pageY;
 
@@ -246,7 +274,7 @@ function onDocumentTouchMove(event) {
 
         event.preventDefault();
         // console.log('touchMove', lon, lat);
-        isUserDrag = true;
+        isUserInteracting = true;
 
         lon = (onPointerDownPointerX - event.touches[0].pageX) * 0.1 + onPointerDownLon;
         lat = (event.touches[0].pageY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
@@ -257,6 +285,17 @@ function onDocumentTouchMove(event) {
 
 function onDocumentTouchEnd(event) {
     // console.log('touchEnd');
-    isUserDrag = false;
-
+    var dx = lon - onPointerDownLon;
+    var dy = lat - onPointerDownLat;
+    var dd = Date.now() - latestInteraction;
+    var speedX = Math.abs(dx/dd).toFixed(2);
+    var speedY = Math.abs(dy/dd).toFixed(2);
+    console.log(speedX,speedY,camera.position );
+    timer = setInterval(function() {
+        isUserInteracting = false;
+        o.init();
+    },1000);
+    // if (speedX > 0.5  || speedY > 0.5) {
+    //     render(lon + dx * speedX, lat + dy * speedY);
+    // }
 }
