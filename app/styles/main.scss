@@ -16,7 +16,7 @@ body {
     height: 100px;
     position: fixed;
     bottom: 0;
-    right: 0;
+    left: 0;
     z-index: 999;
 }
 
@@ -24,8 +24,8 @@ body {
     position: absolute;
     width: 50px;
     height: 50px;
-    right: 4px;
-    bottom: 4px;
+    right: 50px;
+    bottom: 50px;
     border-radius: 25px;
     background-image: url('../images/compass.svg');
     cursor: default;

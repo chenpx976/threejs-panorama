@@ -2,7 +2,6 @@
   "name": "threejs-demo",
   "private": true,
   "dependencies": {
-    "jquery": "~2.*",
-    "stats.js": "*"
+
   }
 }
