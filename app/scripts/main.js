@@ -5,7 +5,7 @@ var isUserInteracting = false,
     flagDrag = true,
     flagOri = true,
     flagDebug = true,
-    lon = 90,
+    lon = 0,
     lat = 0,
     phi = 0,
     theta = 0,
@@ -127,6 +127,7 @@ function init() {
     animate();
 
 }
+
 function oriInit() {
     o.handler = function(obj) {
         /*var tip = document.getElementById('tip');
@@ -214,7 +215,7 @@ function onDocumentMouseDown(event) {
     event.preventDefault();
 
     isUserInteracting = true;
-
+    console.log(lon,lat);
     onPointerDownPointerX = event.clientX;
     onPointerDownPointerY = event.clientY;
 
@@ -256,8 +257,6 @@ function onDocumentTouchStart(event) {
         // console.log('touchstart');
         isUserInteracting = true;
         latestInteraction = Date.now();
-        o.destroy();
-        clearInterval(timer);
         onPointerDownPointerX = event.touches[0].pageX;
         onPointerDownPointerY = event.touches[0].pageY;
 
@@ -285,16 +284,7 @@ function onDocumentTouchMove(event) {
 
 function onDocumentTouchEnd(event) {
     // console.log('touchEnd');
-    var dx = lon - onPointerDownLon;
-    var dy = lat - onPointerDownLat;
-    var dd = Date.now() - latestInteraction;
-    var speedX = Math.abs(dx/dd).toFixed(2);
-    var speedY = Math.abs(dy/dd).toFixed(2);
-    console.log(speedX,speedY,camera.position );
-    timer = setInterval(function() {
-        isUserInteracting = false;
-        o.init();
-    },1000);
+    isUserInteracting = false;
     // if (speedX > 0.5  || speedY > 0.5) {
     //     render(lon + dx * speedX, lat + dy * speedY);
     // }
