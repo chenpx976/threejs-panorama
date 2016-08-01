@@ -1,10 +1,10 @@
 # 全景图
 
- - 'git clone'
- - 'npm i'
- - 'gulp serve' 开发模式
- - 'gulp' 打包
- - 'gulp serve:dist' 预览打包
+ - `git clone`
+ - `npm i`
+ - `gulp serve` 开发模式
+ - `gulp` 打包
+ - `gulp serve:dist` 预览打包
 
 
 
